@@ -594,8 +594,205 @@ import { FormsModule } from '@angular/forms';
 ✔ Use **Property Binding (`[property]`)** for updating element properties.  
 ✔ Use **Event Binding (`(event)`)** for user interactions.  
 ✔ Use **Two-Way Binding (`[(ngModel)]`)** for input synchronization.  
+### 🔹 Directives in Angular
+Directives are instructions that tell Angular how to modify the DOM (Document Object Model). They extend HTML's functionality, allowing developers to manipulate the DOM.
+
+### 🔹 Types of Directives
+1️⃣ **Structural Directives** → Modify the structure of the DOM (add/remove elements).
+2️⃣ **Attribute Directives** → Modify the appearance or behavior of an element.
+3️⃣ **Custom Directives** → User-defined directives that add custom behavior.
+
+---
+### 1️⃣ Structural Directives (*ngIf, *ngFor, *ngSwitch)
+✔ Used to change the DOM structure (e.g., adding or removing elements).
+✔ Structural directives are responsible for manipulating the DOM layout by adding, removing, or altering elements based on conditions.
+✔ They are denoted by an asterisk (*) preceding the directive name.
+
+#### 📌 *ngIf → Conditionally Show/Hide Elements
+✔ Removes/creates elements in the DOM based on a boolean condition.
+✔ If the condition is false, the element is removed from the DOM, not just hidden.
+
+**Example:**
+```typescript
+export class AppComponent {
+  isLoggedIn = true;
+}
+```
+```html
+<p *ngIf="isLoggedIn">Welcome, User!</p>  <!-- Will show only if isLoggedIn is true -->
+```
+
+#### 📌 *ngIf with else
+✔ You can define an else block using `<ng-template>`.
+```html
+<p *ngIf="isLoggedIn; else loggedOutTemplate">Welcome, User!</p>
+<ng-template #loggedOutTemplate>
+  <p>Please log in!</p>
+</ng-template>
+```
+✔ If `isLoggedIn = false`, it will show "Please log in!".
+
+#### 📌 *ngFor → Loops Over an Array
+✔ Loops through an array and creates elements dynamically.
+
+**Example:**
+```typescript
+export class AppComponent {
+  users = ['Alice', 'Bob', 'Charlie'];
+}
+```
+```html
+<ul>
+  <li *ngFor="let user of users">{{ user }}</li>
+</ul>
+```
+✔ Output:
+```html
+<ul>
+  <li>Alice</li>
+  <li>Bob</li>
+  <li>Charlie</li>
+</ul>
+```
+
+#### 📌 *ngFor with Index
+```html
+<ul>
+  <li *ngFor="let user of users; let i = index">{{ i + 1 }}. {{ user }}</li>
+</ul>
+```
+✔ Output:
+```html
+<ul>
+  <li>1. Alice</li>
+  <li>2. Bob</li>
+  <li>3. Charlie</li>
+</ul>
+```
+
+#### 📌 *ngSwitch → Multiple Conditional Rendering
+✔ Similar to a `switch-case` statement in JavaScript.
+✔ Used when you need multiple conditions.
+
+**Example:**
+```typescript
+export class AppComponent {
+  role = 'admin';
+}
+```
+```html
+<div [ngSwitch]="role">
+  <p *ngSwitchCase="'admin'">Admin Panel</p>
+  <p *ngSwitchCase="'user'">User Dashboard</p>
+  <p *ngSwitchDefault>Guest Page</p>
+</div>
+```
+✔ If `role = 'admin'`, "Admin Panel" will be displayed.
+
+---
+### 2️⃣ Attribute Directives (ngStyle, ngClass)
+✔ Modify the appearance or behavior of an element.
+✔ Do not change the DOM structure.
+
+#### 📌 ngStyle → Apply Styles Dynamically
+✔ Allows you to apply styles dynamically.
+
+**Example:**
+```typescript
+export class AppComponent {
+  textColor = 'blue';
+}
+```
+```html
+<p [ngStyle]="{ color: textColor }">This text is blue.</p>
+```
+✔ You can also use a method instead of a variable:
+```html
+<p [ngStyle]="{ color: getColor() }">Dynamic Color</p>
+```
+```typescript
+getColor() {
+  return Math.random() > 0.5 ? 'green' : 'red';
+}
+```
+✔ Text color will randomly change between red and green.
+
+#### 📌 ngClass → Apply CSS Classes Dynamically
+✔ Adds/removes CSS classes based on conditions.
+
+**Example:**
+```typescript
+export class AppComponent {
+  isActive = true;
+}
+```
+```html
+<p [ngClass]="{ 'active': isActive, 'inactive': !isActive }">This text has a class.</p>
+```
+✔ If `isActive = true`, the "active" class is applied.
+✔ If `isActive = false`, the "inactive" class is applied.
+
+---
+### 3️⃣ Custom Directives (Creating Your Own Directive)
+✔ You can create your own directive to apply custom behavior.
+
+#### 📌 Example: Creating a Custom Directive (appTurnGreen)
+✔ This directive changes the background color of an element to green.
+
+1️⃣ **Create a New Directive**
+Run the command:
+```bash
+ng generate directive turnGreen
+```
+✔ This creates: `turn-green.directive.ts`.
+
+2️⃣ **Implement Custom Logic**
+Modify the generated directive file:
+```typescript
+import { Directive, ElementRef, Renderer2, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appTurnGreen]'
+})
+export class TurnGreenDirective implements OnInit {
+  constructor(private el: ElementRef, private renderer: Renderer2) {}
+
+  ngOnInit() {
+    this.renderer.setStyle(this.el.nativeElement, 'background-color', 'green');
+  }
+}
+```
+✔ This modifies the element’s background to green when applied.
+
+3️⃣ **Use the Custom Directive in HTML**
+```html
+<p appTurnGreen>This text has a green background!</p>
+```
+✔ Any `<p>` element with `appTurnGreen` will get a green background.
+
+---
+### 4️⃣ Component Directives
+✔ Components are directives with templates.
+✔ They are the building blocks of Angular applications, encapsulating both the UI and the behavior of a part of the application.
+✔ Declared using the `@Component` decorator and typically have a corresponding HTML template.
+
+#### 📌 Syntax:
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+    selector: 'app-root',
+    templateUrl: './app.component.html',
+})
+export class AppComponent {}
+```
+---
+🎯 **Summary:**
+✔ Structural directives (`*ngIf`, `*ngFor`, `*ngSwitch`) modify the DOM structure.
+✔ Attribute directives (`ngStyle`, `ngClass`) modify appearance or behavior.
+✔ Custom directives allow you to create your own behaviors.
+✔ Component directives are the foundation of Angular applications.
+
+🚀 Keep practicing and mastering directives to build dynamic and efficient Angular apps! 🎯
 
 
-Here's your improved and well-structured version of the notes on **Directives in Angular**:
-
-This version improves clarity, formatting, and readability while maintaining all the essential details. Let me know if you'd like any modifications! 🚀
