@@ -8,6 +8,7 @@ Why Use Angular?
  ✅ Uses TypeScript, offering better code maintainability.
  ✅ Built-in features like routing, forms, and dependency injection.
 
+
 2️⃣ Features of Angular
 ✔ Component-Based Architecture – Applications are built using reusable and independent components.
  ✔ Two-Way Data Binding – Syncs data between the model and view automatically.
