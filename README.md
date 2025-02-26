@@ -1,4 +1,5 @@
 🔹 Angular Basics
+
 1️⃣ What is Angular?
 Angular is a TypeScript-based, open-source front-end framework developed by Google for building single-page applications (SPAs). It provides a structured and scalable way to create dynamic web applications.
 Why Use Angular?
