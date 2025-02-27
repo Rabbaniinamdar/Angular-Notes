@@ -179,9 +179,9 @@ This guide explains components and modules in Angular with definitions and examp
 
 A component is the building block of an Angular application. It controls a section of the UI and consists of:
 
-✔ A TypeScript class (for logic)
-✔ An HTML template (for UI)
-✔ CSS styles (for design)
+- ✔ A TypeScript class (for logic)
+- ✔ An HTML template (for UI)
+- ✔ CSS styles (for design)
 
 ### Example of a Component
 
@@ -564,8 +564,8 @@ export class AppComponent {
 ---
 
 ## **8️⃣ Two-Way Data Binding (`[(ngModel)]="data"`)**  
-✔ Combines **Property Binding + Event Binding**.  
-✔ Updates both the UI and TypeScript property when the user types.  
+- ✔ Combines **Property Binding + Event Binding**.  
+- ✔ Updates both the UI and TypeScript property when the user types.  
 
 🔹 **Example**  
 ```typescript
@@ -590,27 +590,28 @@ import { FormsModule } from '@angular/forms';
 ---
 
 ## **9️⃣ Summary: Key Takeaways**  
-✔ Use **String Interpolation (`{{ }}`)** for inserting text.  
-✔ Use **Property Binding (`[property]`)** for updating element properties.  
-✔ Use **Event Binding (`(event)`)** for user interactions.  
-✔ Use **Two-Way Binding (`[(ngModel)]`)** for input synchronization.  
+- ✔ Use **String Interpolation (`{{ }}`)** for inserting text.  
+- ✔ Use **Property Binding (`[property]`)** for updating element properties.  
+- ✔ Use **Event Binding (`(event)`)** for user interactions.  
+- ✔ Use **Two-Way Binding (`[(ngModel)]`)** for input synchronization.
+    
 ### 🔹 Directives in Angular
 Directives are instructions that tell Angular how to modify the DOM (Document Object Model). They extend HTML's functionality, allowing developers to manipulate the DOM.
 
 ### 🔹 Types of Directives
-1️⃣ **Structural Directives** → Modify the structure of the DOM (add/remove elements).
-2️⃣ **Attribute Directives** → Modify the appearance or behavior of an element.
-3️⃣ **Custom Directives** → User-defined directives that add custom behavior.
+- 1️⃣ **Structural Directives** → Modify the structure of the DOM (add/remove elements).
+- 2️⃣ **Attribute Directives** → Modify the appearance or behavior of an element.
+- 3️⃣ **Custom Directives** → User-defined directives that add custom behavior.
 
 ---
 ### 1️⃣ Structural Directives (*ngIf, *ngFor, *ngSwitch)
-✔ Used to change the DOM structure (e.g., adding or removing elements).
-✔ Structural directives are responsible for manipulating the DOM layout by adding, removing, or altering elements based on conditions.
-✔ They are denoted by an asterisk (*) preceding the directive name.
+- ✔ Used to change the DOM structure (e.g., adding or removing elements).
+- ✔ Structural directives are responsible for manipulating the DOM layout by adding, removing, or altering elements based on conditions.
+- ✔ They are denoted by an asterisk (*) preceding the directive name.
 
 #### 📌 *ngIf → Conditionally Show/Hide Elements
-✔ Removes/creates elements in the DOM based on a boolean condition.
-✔ If the condition is false, the element is removed from the DOM, not just hidden.
+- ✔ Removes/creates elements in the DOM based on a boolean condition.
+- ✔ If the condition is false, the element is removed from the DOM, not just hidden.
 
 **Example:**
 ```typescript
@@ -772,9 +773,9 @@ export class TurnGreenDirective implements OnInit {
 
 ---
 ### 4️⃣ Component Directives
-✔ Components are directives with templates.
-✔ They are the building blocks of Angular applications, encapsulating both the UI and the behavior of a part of the application.
-✔ Declared using the `@Component` decorator and typically have a corresponding HTML template.
+- ✔ Components are directives with templates.
+- ✔ They are the building blocks of Angular applications, encapsulating both the UI and the behavior of a part of the application.
+- ✔ Declared using the `@Component` decorator and typically have a corresponding HTML template.
 
 #### 📌 Syntax:
 ```typescript
@@ -788,11 +789,7 @@ export class AppComponent {}
 ```
 ---
 🎯 **Summary:**
-✔ Structural directives (`*ngIf`, `*ngFor`, `*ngSwitch`) modify the DOM structure.
-✔ Attribute directives (`ngStyle`, `ngClass`) modify appearance or behavior.
-✔ Custom directives allow you to create your own behaviors.
-✔ Component directives are the foundation of Angular applications.
-
-🚀 Keep practicing and mastering directives to build dynamic and efficient Angular apps! 🎯
-
-
+- ✔ Structural directives (`*ngIf`, `*ngFor`, `*ngSwitch`) modify the DOM structure.
+- ✔ Attribute directives (`ngStyle`, `ngClass`) modify appearance or behavior.
+- ✔ Custom directives allow you to create your own behaviors.
+- ✔ Component directives are the foundation of Angular applications.
