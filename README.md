@@ -793,3 +793,212 @@ export class AppComponent {}
 - ✔ Attribute directives (`ngStyle`, `ngClass`) modify appearance or behavior.
 - ✔ Custom directives allow you to create your own behaviors.
 - ✔ Component directives are the foundation of Angular applications.
+
+### **🔹 Understanding @Input, @Output, and @ViewChild in Angular**  
+
+Angular provides powerful decorators like `@Input()`, `@Output()`, and `@ViewChild()` to facilitate **communication between components** and access DOM elements.
+
+---
+
+## **✅ @Input() Decorator**  
+### **📌 Definition:**  
+- `@Input()` is used to pass data **from a parent component to a child component**.  
+- It allows the parent component to bind a value to a property in the child component.
+
+### **📌 Example: Passing Data from Parent to Child**  
+
+#### **1️⃣ Child Component (server.component.ts)**
+```typescript
+import { Component, Input } from '@angular/core';
+
+@Component({
+  selector: 'app-server',
+  template: `<p>Server Name: {{ serverName }}</p>`,
+})
+export class ServerComponent {
+  @Input() serverName: string = '';  // Accepts value from parent
+}
+```
+
+#### **2️⃣ Parent Component (app.component.html)**
+```html
+<app-server [serverName]="'Main Server'"></app-server>
+```
+
+✔️ **Output in Browser:**  
+```
+Server Name: Main Server
+```
+
+✔️ **Custom Property Name with Alias:**  
+```typescript
+@Input('srvElement') serverName: string = '';  // Renaming property
+```
+```html
+<app-server [srvElement]="'Main Server'"></app-server>
+```
+
+---
+
+## **✅ @Output() Decorator**  
+### **📌 Definition:**  
+- `@Output()` is used to emit an **event from a child component to a parent component**.  
+- It allows the child component to send data back to the parent component using `EventEmitter`.
+
+### **📌 Example: Sending Data from Child to Parent**  
+
+#### **1️⃣ Child Component (server.component.ts)**
+```typescript
+import { Component, EventEmitter, Output } from '@angular/core';
+
+@Component({
+  selector: 'app-server',
+  template: `<button (click)="onAddServer()">Add Server</button>`,
+})
+export class ServerComponent {
+  @Output() serverCreated = new EventEmitter<string>();  // Define custom event
+
+  onAddServer() {
+    this.serverCreated.emit('New Server Created');  // Emit event with data
+  }
+}
+```
+
+#### **2️⃣ Parent Component (app.component.html)**
+```html
+<app-server (serverCreated)="onServerAdded($event)"></app-server>
+```
+
+#### **3️⃣ Parent Component (app.component.ts)**
+```typescript
+onServerAdded(serverName: string) {
+  console.log('Received from Child:', serverName);
+}
+```
+
+✔️ **Console Output when button is clicked:**  
+```
+Received from Child: New Server Created
+```
+
+✔️ **Emitting an Object Instead of a String:**  
+```typescript
+@Output() serverCreated = new EventEmitter<{ name: string; status: string }>();
+
+onAddServer() {
+  this.serverCreated.emit({ name: 'Server 1', status: 'Active' });
+}
+```
+```typescript
+onServerAdded(eventData: { name: string; status: string }) {
+  console.log('Server Name:', eventData.name, 'Status:', eventData.status);
+}
+```
+
+---
+
+## **✅ @ViewChild() Decorator**  
+### **📌 Definition:**  
+- `@ViewChild()` is used to access a **local reference of an HTML element or a child component** inside a TypeScript file.  
+- It helps interact with DOM elements **or child component methods/properties** directly.
+
+### **📌 Example 1: Accessing an HTML Element**  
+
+#### **1️⃣ Template File (server.component.html)**
+```html
+<input #serverNameInput type="text">
+<button (click)="onAddServer()">Add Server</button>
+```
+
+#### **2️⃣ Component File (server.component.ts)**
+```typescript
+import { Component, ViewChild, ElementRef } from '@angular/core';
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html',
+})
+export class ServerComponent {
+  @ViewChild('serverNameInput') nameInputRef!: ElementRef;  // Access local reference
+
+  onAddServer() {
+    console.log(this.nameInputRef.nativeElement.value);  // Get input value
+  }
+}
+```
+
+✔️ **When user enters "Hello" in input and clicks the button, the console prints:**  
+```
+Hello
+```
+
+---
+
+### **📌 Example 2: Accessing a Child Component**  
+You can also use `@ViewChild()` to access a child component inside a parent.
+
+#### **1️⃣ Child Component (server.component.ts)**
+```typescript
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-server',
+  template: `<p>Server Status: {{ getStatus() }}</p>`,
+})
+export class ServerComponent {
+  getStatus() {
+    return 'Online';
+  }
+}
+```
+
+#### **2️⃣ Parent Component (app.component.ts)**
+```typescript
+import { Component, ViewChild } from '@angular/core';
+import { ServerComponent } from './server/server.component';
+
+@Component({
+  selector: 'app-root',
+  template: `<app-server></app-server>
+             <button (click)="checkServerStatus()">Check Status</button>`,
+})
+export class AppComponent {
+  @ViewChild(ServerComponent) serverComponent!: ServerComponent;
+
+  checkServerStatus() {
+    console.log('Server Status:', this.serverComponent.getStatus());
+  }
+}
+```
+
+✔️ **When button is clicked, console prints:**  
+```
+Server Status: Online
+```
+
+---
+
+## **🔹 Summary Table**
+| **Decorator**  | **Purpose**  | **Direction** | **Used In**  |
+|---------------|-------------|--------------|--------------|
+| `@Input()`   | Pass data **from parent to child** | Parent → Child | Child Component |
+| `@Output()`  | Send event/data **from child to parent** | Child → Parent | Child Component |
+| `@ViewChild()` | Access an element or child component in TS | **Access template DOM or child component** | Parent Component |
+
+---
+
+## **🔹 Key Differences**
+| **Feature**       | **@Input()**        | **@Output()**       | **@ViewChild()**      |
+|------------------|-------------------|-------------------|-------------------|
+| **Purpose**      | Pass data from parent to child | Send event from child to parent | Access template element or child component |
+| **Binding Type** | Property binding (`[]`) | Event binding (`()`) | Direct reference |
+| **Direction**    | **Parent → Child** | **Child → Parent** | **Access DOM/Child Component** |
+| **Used In**      | Child Component | Child Component | Parent Component |
+
+---
+
+### **🚀 Conclusion**
+- **Use `@Input()`** when **parent** needs to pass data **to child**.  
+- **Use `@Output()`** when **child** needs to send data **to parent**.  
+- **Use `@ViewChild()`** to access **local references** (HTML elements or child components) in **TypeScript**.  
+
