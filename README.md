@@ -1000,5 +1000,237 @@ Server Status: Online
 ### **🚀 Conclusion**
 - **Use `@Input()`** when **parent** needs to pass data **to child**.  
 - **Use `@Output()`** when **child** needs to send data **to parent**.  
-- **Use `@ViewChild()`** to access **local references** (HTML elements or child components) in **TypeScript**.  
+- **Use `@ViewChild()`** to access **local references** (HTML elements or child components) in **TypeScript**.
 
+### **🔹 Understanding `ng-content` and Component Lifecycle Hooks in Angular**  
+
+## **✅ `ng-content` (Passing Data to a Component)**  
+### **📌 Definition:**  
+- The `<ng-content></ng-content>` tag allows you to **project content** into a component.  
+- By default, **Angular removes** any content placed between the opening and closing tag of a custom component.  
+- Using `<ng-content></ng-content>` helps insert that content **inside the component’s template**.  
+
+### **📌 Example: Using `ng-content`**  
+
+#### **1️⃣ Child Component (`card.component.html`)**
+```html
+<div class="card">
+  <h3>Reusable Card Component</h3>
+  <ng-content></ng-content>  <!-- Content from parent will be placed here -->
+</div>
+```
+
+#### **2️⃣ Parent Component (`app.component.html`)**
+```html
+<app-card>
+  <p>This is projected content inside the card!</p>
+</app-card>
+```
+
+✔️ **Final Rendered Output in Browser:**  
+```html
+<div class="card">
+  <h3>Reusable Card Component</h3>
+  <p>This is projected content inside the card!</p>
+</div>
+```
+
+---
+
+## **✅ Component Lifecycle Hooks**  
+When a component is created, Angular **executes different lifecycle hooks** at different phases. These hooks allow you to run custom code at each phase.
+
+### **📌 Angular Lifecycle Hooks (in Order of Execution)**  
+
+| **Hook Name**                  | **Execution Time** |
+|--------------------------------|-------------------|
+| `ngOnChanges()`                 | Runs when **@Input() properties** change |
+| `ngOnInit()`                    | Runs **once after initialization** |
+| `ngDoCheck()`                   | Runs on **every change detection cycle** |
+| `ngAfterContentInit()`          | Runs **after projected content (`ng-content`) is initialized** |
+| `ngAfterContentChecked()`       | Runs **after projected content is checked** |
+| `ngAfterViewInit()`             | Runs **after the component’s view has been initialized** |
+| `ngAfterViewChecked()`          | Runs **after the component’s view has been checked** |
+| `ngOnDestroy()`                 | Runs **right before the component is destroyed** |
+
+---
+
+## **🔹 Lifecycle Hooks Explained with Examples**  
+
+### **1️⃣ `ngOnChanges()` - Detects Changes in `@Input()` Properties**
+- Called when an **`@Input()` property changes**.  
+- Runs **before `ngOnInit()`** and on every change of input values.
+
+#### **📌 Example: Using `ngOnChanges()`**
+```typescript
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: `<p>Message: {{ message }}</p>`,
+})
+export class ChildComponent implements OnChanges {
+  @Input() message!: string;
+
+  ngOnChanges(changes: SimpleChanges) {
+    console.log('ngOnChanges triggered:', changes);
+  }
+}
+```
+
+✔️ **When Parent Updates `message` Input Property, `ngOnChanges()` Runs.**  
+
+---
+
+### **2️⃣ `ngOnInit()` - Runs Once After Initialization**  
+- Called **after the component is initialized**.  
+- Runs **only once** in the component’s lifecycle.
+
+#### **📌 Example: Using `ngOnInit()`**
+```typescript
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: `<p>Example Component</p>`,
+})
+export class ExampleComponent implements OnInit {
+  ngOnInit() {
+    console.log('ngOnInit called - Component initialized!');
+  }
+}
+```
+
+✔️ **Output in Console:**  
+```
+ngOnInit called - Component initialized!
+```
+
+---
+
+### **3️⃣ `ngDoCheck()` - Runs on Every Change Detection Cycle**  
+- Runs **whenever change detection is triggered**.  
+- Useful for **manually detecting changes**.
+
+#### **📌 Example: Using `ngDoCheck()`**
+```typescript
+import { Component, DoCheck } from '@angular/core';
+
+@Component({
+  selector: 'app-check',
+  template: `<p>{{ counter }}</p>
+             <button (click)="increment()">Increment</button>`,
+})
+export class CheckComponent implements DoCheck {
+  counter = 0;
+
+  increment() {
+    this.counter++;
+  }
+
+  ngDoCheck() {
+    console.log('ngDoCheck - Change detected!');
+  }
+}
+```
+
+✔️ **Console logs `ngDoCheck - Change detected!` every time the button is clicked.**  
+
+---
+
+### **4️⃣ `ngAfterContentInit()` - Runs After `ng-content` is Initialized**  
+- Called **after the content inside `<ng-content>` is initialized**.
+
+#### **📌 Example: Using `ngAfterContentInit()`**
+```typescript
+import { Component, AfterContentInit, ContentChild, ElementRef } from '@angular/core';
+
+@Component({
+  selector: 'app-card',
+  template: `<h3>Card Component</h3> <ng-content></ng-content>`,
+})
+export class CardComponent implements AfterContentInit {
+  @ContentChild('projectedContent') content!: ElementRef;
+
+  ngAfterContentInit() {
+    console.log('ngAfterContentInit - Projected content:', this.content.nativeElement.textContent);
+  }
+}
+```
+
+✔️ **Console logs content from `<ng-content>` when initialized.**  
+
+---
+
+### **5️⃣ `ngAfterViewInit()` - Runs After Component’s View is Rendered**  
+- Runs **after the component’s view and child views have been initialized**.  
+- Gives access to **DOM elements using `@ViewChild()`**.
+
+#### **📌 Example: Using `ngAfterViewInit()`**
+```typescript
+import { Component, ViewChild, AfterViewInit, ElementRef } from '@angular/core';
+
+@Component({
+  selector: 'app-view-child',
+  template: `<p #textRef>Hello Angular</p>`,
+})
+export class ViewChildComponent implements AfterViewInit {
+  @ViewChild('textRef') textElement!: ElementRef;
+
+  ngAfterViewInit() {
+    console.log('ngAfterViewInit - Text content:', this.textElement.nativeElement.textContent);
+  }
+}
+```
+
+✔️ **Console logs:** `ngAfterViewInit - Text content: Hello Angular`  
+
+---
+
+### **6️⃣ `ngOnDestroy()` - Runs Before Component is Destroyed**  
+- Called **before a component is removed from the DOM**.  
+- Useful for **cleaning up subscriptions or resources**.
+
+#### **📌 Example: Using `ngOnDestroy()`**
+```typescript
+import { Component, OnDestroy } from '@angular/core';
+
+@Component({
+  selector: 'app-example',
+  template: `<p>Example Component</p>`,
+})
+export class ExampleComponent implements OnDestroy {
+  ngOnDestroy() {
+    console.log('ngOnDestroy - Component is about to be destroyed!');
+  }
+}
+```
+
+✔️ **Console logs when the component is removed:**  
+```
+ngOnDestroy - Component is about to be destroyed!
+```
+
+---
+
+## **🔹 Summary Table**
+| **Hook**                     | **Purpose** |
+|------------------------------|------------|
+| `ngOnChanges()`              | Runs when `@Input()` properties change |
+| `ngOnInit()`                 | Runs **once** after component initialization |
+| `ngDoCheck()`                | Runs on **every change detection cycle** |
+| `ngAfterContentInit()`       | Runs **after `<ng-content>` is initialized** |
+| `ngAfterContentChecked()`    | Runs **after checking `<ng-content>`** |
+| `ngAfterViewInit()`          | Runs **after the component’s view is initialized** |
+| `ngAfterViewChecked()`       | Runs **after checking the component’s view** |
+| `ngOnDestroy()`              | Runs **before the component is destroyed** |
+
+---
+
+### **🚀 Conclusion**
+- **Use `<ng-content>`** to project **dynamic content** into a component.  
+- **Use lifecycle hooks** to execute logic at different phases of a component's life.  
+- **Key hooks to remember:**  
+  - `ngOnInit()` for initialization.  
+  - `ngOnChanges()` for detecting `@Input()` changes.  
+  - `ngOnDestroy()` for cleanup.  
