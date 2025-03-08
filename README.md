@@ -1234,3 +1234,294 @@ ngOnDestroy - Component is about to be destroyed!
   - `ngOnInit()` for initialization.  
   - `ngOnChanges()` for detecting `@Input()` changes.  
   - `ngOnDestroy()` for cleanup.  
+
+### **📌 @ContentChild, @ContentChildren, @ViewChild, @ViewChildren in Angular**
+These decorators help access child elements or components in Angular.
+
+---
+
+## **1️⃣ @ContentChild**
+- Retrieves a **single** projected element/component inside `<ng-content>`.
+- Used inside a child component to access a single projected element from the parent.
+- Returns the **first matching** element.
+
+### **Example of @ContentChild**
+#### **📌 Parent Component (Using the Child)**
+```html
+<app-child>
+  <p #projectedContent>Projected Paragraph from Parent</p>
+</app-child>
+```
+
+#### **📌 Child Component (Accessing Projected Content)**
+```typescript
+import { Component, ContentChild, ElementRef, AfterViewInit } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: '<ng-content></ng-content>',
+})
+export class ChildComponent implements AfterViewInit {
+  @ContentChild('projectedContent', { static: false }) paragraph: ElementRef;
+
+  ngAfterViewInit() {
+    console.log(this.paragraph.nativeElement.textContent); // Output: Projected Paragraph from Parent
+  }
+}
+```
+✔ **Used Inside the Child Component**  
+✔ **Only the First Matching Element is Retrieved**
+
+---
+
+## **2️⃣ @ContentChildren**
+- Retrieves **multiple** projected elements inside `<ng-content>`.
+- Used inside a child component to access multiple projected elements.
+- Returns a **QueryList** (like an array).
+
+### **Example of @ContentChildren**
+#### **📌 Parent Component (Using the Child)**
+```html
+<app-child>
+  <p>First Projected Paragraph</p>
+  <p>Second Projected Paragraph</p>
+</app-child>
+```
+
+#### **📌 Child Component (Accessing Multiple Projected Elements)**
+```typescript
+import { Component, ContentChildren, QueryList, AfterViewInit, ElementRef } from '@angular/core';
+
+@Component({
+  selector: 'app-child',
+  template: '<ng-content></ng-content>',
+})
+export class ChildComponent implements AfterViewInit {
+  @ContentChildren('projectedContent', { descendants: true }) paragraphs: QueryList<ElementRef>;
+
+  ngAfterViewInit() {
+    this.paragraphs.forEach(p => console.log(p.nativeElement.textContent));
+  }
+}
+```
+✔ **Used Inside the Child Component**  
+✔ **Retrieves Multiple Projected Elements**  
+✔ **Returns a QueryList** (Use `.forEach()` to loop through)
+
+---
+
+## **3️⃣ @ViewChild**
+- Retrieves a **single** element/component from the child DOM **inside the same component**.
+- Used to **access template elements in the component’s view**.
+
+### **Example of @ViewChild**
+#### **📌 Component Template (HTML)**
+```html
+<p #myParagraph>Hello, Angular!</p>
+<button (click)="changeText()">Change Text</button>
+```
+
+#### **📌 Component (TypeScript)**
+```typescript
+import { Component, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+})
+export class AppComponent implements AfterViewInit {
+  @ViewChild('myParagraph', { static: false }) paragraph: ElementRef;
+
+  ngAfterViewInit() {
+    console.log(this.paragraph.nativeElement.textContent); // Output: Hello, Angular!
+  }
+
+  changeText() {
+    this.paragraph.nativeElement.textContent = "Text Changed!";
+  }
+}
+```
+✔ **Used Inside the Same Component**  
+✔ **Only the First Matching Element is Retrieved**  
+✔ **Use `static: false` when accessing it in `ngAfterViewInit`**  
+
+---
+
+## **4️⃣ @ViewChildren**
+- Retrieves **multiple** elements/components from the child DOM **inside the same component**.
+- Returns a **QueryList** (use `.forEach()` to loop through elements).
+
+### **Example of @ViewChildren**
+#### **📌 Component Template (HTML)**
+```html
+<p #myParagraph>Hello, Angular!</p>
+<p #myParagraph>Another Paragraph</p>
+<button (click)="changeText()">Change All Text</button>
+```
+
+#### **📌 Component (TypeScript)**
+```typescript
+import { Component, ViewChildren, QueryList, ElementRef, AfterViewInit } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+})
+export class AppComponent implements AfterViewInit {
+  @ViewChildren('myParagraph') paragraphs: QueryList<ElementRef>;
+
+  ngAfterViewInit() {
+    this.paragraphs.forEach(p => console.log(p.nativeElement.textContent));
+  }
+
+  changeText() {
+    this.paragraphs.forEach(p => (p.nativeElement.textContent = "Text Changed!"));
+  }
+}
+```
+✔ **Used Inside the Same Component**  
+✔ **Retrieves Multiple Elements**  
+✔ **Returns a QueryList** (use `.forEach()` to loop through)
+
+---
+
+## **🔥 Summary Table**
+| Decorator       | Retrieves From  | Single/Multiple  | Used In |
+|---------------|---------------|----------------|--------|
+| `@ContentChild` | **Projected Content** (`<ng-content>`) | Single | Child Component |
+| `@ContentChildren` | **Projected Content** (`<ng-content>`) | Multiple (`QueryList`) | Child Component |
+| `@ViewChild` | **Component's Own Template** | Single | Same Component |
+| `@ViewChildren` | **Component's Own Template** | Multiple (`QueryList`) | Same Component |
+
+---
+
+### **🚀 Key Takeaways**
+- `@ContentChild` & `@ContentChildren` → Used inside a **child component** to access projected content.
+- `@ViewChild` & `@ViewChildren` → Used inside the **same component** to access elements in its own template.
+
+### **Understanding @HostListener, @HostBinding, and Directive Property Binding in Angular**
+
+In Angular, **directives** help manipulate the behavior and appearance of elements dynamically. The decorators **`@HostListener`**, **`@HostBinding`**, and **`@Input` (in directives)** provide powerful ways to interact with the DOM.
+
+---
+
+## **1️⃣ @HostListener – Listening to Events on Host Elements**
+### **📌 Definition**
+`@HostListener` is a **decorator** that allows you to listen to **DOM events** on the host element and execute custom logic when those events occur.
+
+### **✅ Example: Changing Background Color on Hover**
+```typescript
+import { Directive, ElementRef, Renderer2, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appHoverHighlight]'
+})
+export class HoverHighlightDirective {
+  constructor(private elRef: ElementRef, private renderer: Renderer2) {}
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'orange');
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.renderer.setStyle(this.elRef.nativeElement, 'background-color', 'transparent');
+  }
+}
+```
+#### **🛠 Usage in HTML**
+```html
+<button appHoverHighlight>Hover Over Me</button>
+```
+✔ **Behavior:** When you hover over the button, its background color changes to **orange**. When the mouse leaves, the color resets.
+
+---
+
+## **2️⃣ @HostBinding – Binding Properties to Host Element**
+### **📌 Definition**
+`@HostBinding` is a **decorator** that allows you to bind a **property of the host element** to a directive property. It helps dynamically modify the **styles, classes, attributes**, etc.
+
+### **✅ Example: Changing Background Color Dynamically**
+```typescript
+import { Directive, HostBinding, HostListener } from '@angular/core';
+
+@Directive({
+  selector: '[appBetterHighlight]'
+})
+export class BetterHighlightDirective {
+  @HostBinding('style.backgroundColor') backgroundColor: string = 'transparent';
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.backgroundColor = 'orange';
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.backgroundColor = 'transparent';
+  }
+}
+```
+#### **🛠 Usage in HTML**
+```html
+<p appBetterHighlight>Hover over this text</p>
+```
+✔ **Behavior:** When you hover over the paragraph, its background color changes to **orange** using direct property binding instead of `Renderer2`.
+
+---
+
+## **3️⃣ Using @Input() for Property Binding in Directives**
+### **📌 Definition**
+`@Input` allows **data to be passed** from the parent component to the directive, making it **customizable**.
+
+### **✅ Example: Configurable Highlight Color**
+```typescript
+import { Directive, HostBinding, HostListener, Input, OnInit } from '@angular/core';
+
+@Directive({
+  selector: '[appCustomHighlight]'
+})
+export class CustomHighlightDirective implements OnInit {
+  @Input() defaultColor: string = 'transparent';
+  @Input('appCustomHighlight') highlightColor: string = 'blue'; // Alias for input binding
+
+  @HostBinding('style.backgroundColor') backgroundColor: string;
+
+  ngOnInit() {
+    this.backgroundColor = this.defaultColor;
+  }
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.backgroundColor = this.highlightColor;
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.backgroundColor = this.defaultColor;
+  }
+}
+```
+#### **🛠 Usage in HTML**
+```html
+<p [appCustomHighlight]="'purple'" [defaultColor]="'yellow'">
+  Hover to see highlight effect!
+</p>
+```
+✔ **Behavior:**  
+- Default background color is **yellow**.
+- On hover, it changes to **purple**.
+- The directive is configurable via **property binding**.
+
+---
+
+### **🔥 Summary Table**
+| Decorator        | Definition & Purpose | Example Use Case |
+|-----------------|----------------------|------------------|
+| `@HostListener` | Listens to **events** on the host element and triggers methods. | Apply hover effect on a button |
+| `@HostBinding`  | Binds a **property of the host element** to the directive. | Change background color dynamically |
+| `@Input` in Directives | Allows **passing data** from the parent component to customize directive behavior. | Set dynamic highlight color |
+
+---
+
+### **🚀 Key Takeaways**
+- **`@HostListener`** → Handles events like **click, hover, keypress** on the host element.
+- **`@HostBinding`** → Directly binds **styles, classes, or attributes** to the host element.
+- **`@Input` in Directives** → Enables **customization** of directives using property binding.
+
+Would you like a **combined example** where all three work together? 😊
