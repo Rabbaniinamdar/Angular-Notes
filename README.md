@@ -1524,4 +1524,161 @@ export class CustomHighlightDirective implements OnInit {
 - **`@HostBinding`** → Directly binds **styles, classes, or attributes** to the host element.
 - **`@Input` in Directives** → Enables **customization** of directives using property binding.
 
-Would you like a **combined example** where all three work together? 😊
+### **Angular Services & Dependency Injection - Explanation with Real-World Use Cases**
+
+### **1️⃣ What is a Service?**
+A **Service** in Angular is a reusable **class** that provides functionality to **multiple components**. It helps to:
+- **Share Data**: Store and manage application data centrally.
+- **Reuse Code**: Avoid duplication by defining logic once.
+- **Enable Communication**: Allow components to communicate without direct interactions.
+- **Perform Side Effects**: Handle things like logging, HTTP requests, authentication, etc.
+
+---
+
+### **2️⃣ Creating a Basic Angular Service**
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root' // This makes the service available across the app
+})
+export class LoggingService {
+  logStatusChange(status: string) {
+    console.log('A server status changed, new status: ' + status);
+  }
+}
+```
+✅ **`@Injectable({ providedIn: 'root' })`**  
+   - This registers the service at the **root level** (no need to add it to `providers` manually).  
+   - Ensures a **single instance** is shared across the app.
+
+---
+
+### **3️⃣ Injecting a Service into a Component**
+To **use** a service in a component, we **inject** it via the constructor.
+
+```typescript
+import { Component } from '@angular/core';
+import { LoggingService } from './logging.service';
+
+@Component({
+  selector: 'app-server',
+  templateUrl: './server.component.html'
+})
+export class ServerComponent {
+  constructor(private loggingService: LoggingService) {}
+
+  onStatusChange() {
+    this.loggingService.logStatusChange('Active');
+  }
+}
+```
+✅ **Angular automatically provides the service** when the component is created.
+
+---
+
+### **4️⃣ Using Services for Data Storage**
+A **service can also store data** that is accessible from multiple components.
+
+```typescript
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AccountsService {
+  accounts = [
+    { name: 'Admin', status: 'active' },
+    { name: 'Guest', status: 'inactive' }
+  ];
+
+  addAccount(name: string, status: string) {
+    this.accounts.push({ name, status });
+  }
+}
+```
+
+---
+
+### **5️⃣ Injecting One Service into Another**
+We can inject a service **inside another service** using **`@Injectable()`**.
+
+```typescript
+import { Injectable } from '@angular/core';
+import { LoggingService } from './logging.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AccountsService {
+  constructor(private loggingService: LoggingService) {}
+
+  addAccount(name: string, status: string) {
+    this.loggingService.logStatusChange(status);
+  }
+}
+```
+✅ **When should you do this?**
+- When a service depends on another service (e.g., **AccountsService** depends on **LoggingService**).
+- Helps to **separate concerns** and maintain a **clean architecture**.
+
+---
+
+### **6️⃣ Using Services for Cross-Component Communication**
+Instead of **@Input() & @Output()**, we can use a **service** with an **EventEmitter**.
+
+#### **🔹 Example: Notifying Components When Data Changes**
+```typescript
+import { Injectable, EventEmitter } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AccountService {
+  statusUpdated = new EventEmitter<string>();
+
+  updateStatus(status: string) {
+    this.statusUpdated.emit(status);
+  }
+}
+```
+#### **🔹 Subscribing to the EventEmitter in a Component**
+```typescript
+export class AccountComponent implements OnInit {
+  constructor(private accountService: AccountService) {}
+
+  ngOnInit() {
+    this.accountService.statusUpdated.subscribe((status: string) => {
+      console.log('Status updated to:', status);
+    });
+  }
+}
+```
+✅ This allows **any component** to listen for **status changes** without **direct interaction**.
+
+---
+
+### **7️⃣ Real-World Use Cases**
+1. **User Authentication**  
+   - Store the authentication state in a service (`AuthService`) and access it from multiple components.
+  
+2. **Shopping Cart**  
+   - Maintain cart data in a `CartService` so multiple components (cart page, checkout) can access it.
+
+3. **Logging & Analytics**  
+   - Use `LoggingService` to log user actions or errors globally.
+
+4. **HTTP Requests & APIs**  
+   - Use `HttpService` to fetch data and share it across components.
+
+---
+
+### **🎯 Summary**
+| Feature           | Purpose |
+|------------------|--------------------------|
+| **Service** | Centralizes code, stores data, shares logic. |
+| **Dependency Injection** | Injects dependencies automatically into components. |
+| **Hierarchical Injector** | Ensures services are shared across the app. |
+| **Injecting Services into Services** | Enables cross-service communication. |
+| **EventEmitter in Services** | Enables component-to-component communication. |
+
