@@ -1682,3 +1682,315 @@ export class AccountComponent implements OnInit {
 | **Injecting Services into Services** | Enables cross-service communication. |
 | **EventEmitter in Services** | Enables component-to-component communication. |
 
+
+# **📌 Angular Routing & Navigation - Complete Guide**
+
+---
+
+## **1️⃣ What is Angular Routing?**
+🔹 **Routing** in Angular allows users to navigate between different views **without reloading the entire page**.  
+🔹 It helps build **Single Page Applications (SPA)** by dynamically loading components based on the URL.
+
+✅ **Example:**  
+When navigating to `/users`, Angular loads the **UsersComponent** without refreshing the page.
+
+---
+
+## **2️⃣ Setting Up Routing in Angular**
+### **Step 1: Import Required Modules**
+```typescript
+import { NgModule } from '@angular/core';
+import { Routes, RouterModule } from '@angular/router';
+```
+📌 The `RouterModule` and `Routes` help define navigation paths.
+
+---
+
+### **Step 2: Define Routes**
+```typescript
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent },  // Default Route
+  { path: 'users', component: UsersComponent },
+  { path: 'servers', component: ServersComponent }
+];
+```
+📌 **Breakdown:**
+- `path: ''` → Empty path (`/`) loads `HomeComponent` by default.
+- `path: 'users'` → Navigating to `/users` loads `UsersComponent`.
+- `path: 'servers'` → Navigating to `/servers` loads `ServersComponent`.
+
+---
+
+### **Step 3: Register Routes in `app.module.ts`**
+```typescript
+@NgModule({
+  imports: [RouterModule.forRoot(appRoutes)],  // Register Routes
+  exports: [RouterModule]
+})
+export class AppModule { }
+```
+✅ **`forRoot(appRoutes)`** tells Angular to use this route configuration **globally**.
+
+---
+
+## **3️⃣ Navigating Between Pages**
+### **1️⃣ Using `<router-outlet>`**
+📌 This **acts as a placeholder** for loading components dynamically.
+
+```html
+<router-outlet></router-outlet>
+```
+🔹 The component associated with the active route **will be displayed here**.
+
+---
+
+### **2️⃣ Using `routerLink` Instead of `href`**
+🚫 **Don’t use `<a href="/users">Users</a>`**, as it reloads the app.  
+✅ Instead, use **routerLink**:
+
+```html
+<a routerLink="/">Home</a>
+<a routerLink="/users">Users</a>
+<a routerLink="/servers">Servers</a>
+```
+
+📌 **Why?**  
+- Prevents full-page reloads.
+- Angular handles navigation **internally**.
+
+✅ **RouterLink as a Property:**
+```html
+<a [routerLink]="['/users']">Users</a>
+```
+
+---
+
+## **4️⃣ Navigating Programmatically**
+Use the **Router Service** to navigate dynamically.
+
+```typescript
+import { Router } from '@angular/router';
+
+constructor(private router: Router) {}
+
+onLoadServers() {
+  this.router.navigate(['/servers']);  // Navigates to /servers
+}
+```
+📌 Useful for **buttons or dropdowns** where you don’t have direct links.
+
+---
+
+## **5️⃣ Dynamic Routing (Passing Parameters)**
+### **1️⃣ Define a Route with Parameters**
+```typescript
+const appRoutes: Routes = [
+  { path: 'users/:id', component: UserComponent }  // Dynamic Route
+];
+```
+📌 `:id` → Placeholder for **dynamic values** (e.g., `/users/5`).
+
+---
+
+### **2️⃣ Fetch Route Parameters**
+📌 **Retrieve parameter inside a component:**
+```typescript
+import { ActivatedRoute } from '@angular/router';
+
+constructor(private route: ActivatedRoute) {}
+
+ngOnInit() {
+  this.userId = this.route.snapshot.params['id'];  // Get 'id' from URL
+}
+```
+
+🔹 **Example URL:** `/users/5`  
+🔹 **Value of `this.userId`?** `5`
+
+---
+
+### **3️⃣ Subscribe to Route Changes**
+**Problem:** If the route updates (e.g., `/users/10` → `/users/20`),  
+the component **won’t reload automatically**.
+
+📌 **Solution:** Subscribe to `params`:
+```typescript
+this.route.params.subscribe(params => {
+  this.userId = params['id'];
+});
+```
+✅ Ensures **route changes are detected dynamically**.
+
+---
+
+## **6️⃣ Query Parameters & Fragments**
+### **1️⃣ What are Query Parameters & Fragments?**
+📌 Query parameters **pass additional data** to a route (`?key=value`).  
+📌 Fragments **point to a specific section** of a page (`#section`).
+
+✅ **Example URL:**  
+`http://localhost:4200/users/1/edit?allowEdit=1#loading`
+- `?allowEdit=1` → Query Parameter
+- `#loading` → Fragment
+
+---
+
+### **2️⃣ Passing Query Parameters & Fragments**
+```typescript
+this.router.navigate(['/servers', 1, 'edit'], { 
+  queryParams: { allowEdit: '1' }, 
+  fragment: 'loading' 
+});
+```
+🔹 Generates **URL:** `/servers/1/edit?allowEdit=1#loading`
+
+---
+
+### **3️⃣ Retrieving Query Parameters & Fragments**
+```typescript
+console.log(this.route.snapshot.queryParams['allowEdit']);  // Output: 1
+console.log(this.route.snapshot.fragment);  // Output: loading
+```
+📌 **Use `.subscribe()` to detect updates dynamically:**
+```typescript
+this.route.queryParams.subscribe(params => {
+  console.log(params['allowEdit']);
+});
+```
+
+---
+
+## **7️⃣ Active Route Styling**
+### **1️⃣ Highlight Active Links**
+Use `routerLinkActive="active"` to **apply a CSS class** to active links.
+
+```html
+<a routerLink="/users" routerLinkActive="active">Users</a>
+```
+🔹 Adds **"active" class** when `/users` is the current route.
+
+---
+
+### **2️⃣ Exact Matching**
+📌 By default, `/` is **always active**. Fix this by adding:
+
+```html
+<a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+```
+
+---
+
+## **8️⃣ Handling Wildcard & Redirects**
+### **1️⃣ Redirect to a Default Route**
+```typescript
+{ path: '', redirectTo: '/home', pathMatch: 'full' }
+```
+🔹 Ensures `/` redirects to `/home`.
+
+---
+
+### **2️⃣ Handle Undefined Routes (Wildcard)**
+```typescript
+{ path: '**', component: NotFoundComponent }
+```
+🔹 **Wildcard (`**`)** catches unknown routes (`/random123`).
+
+---
+
+## **🎯 Summary - Key Takeaways**
+| Feature | Explanation |
+|---------|------------|
+| **Routing** | Navigation without page reload |
+| **RouterModule** | Enables routing in Angular |
+| **`<router-outlet>`** | Displays routed components dynamically |
+| **`routerLink`** | Navigation without full-page reload |
+| **`ActivatedRoute`** | Fetches route parameters |
+| **Dynamic Routes** | Use `:id` to pass values |
+| **Query Parameters** | Use `?key=value` for extra data |
+| **Fragments** | Use `#section` for specific page sections |
+| **Programmatic Navigation** | Use `this.router.navigate()` |
+| **Active Styling** | `routerLinkActive="active"` |
+| **Wildcard Route (`**`)** | Handles unknown routes |
+
+In Angular, `ActivatedRoute` provides different ways to access route parameters and query parameters:  
+
+### **1️⃣ `paramMap` vs `param`**
+Used to retrieve **route parameters** (`:id`) from the URL.
+
+| Feature  | `paramMap` | `param` |
+|----------|-----------|---------|
+| Type     | Observable (`paramMap.subscribe()`) | Snapshot (`this.route.snapshot.params`) |
+| When to use | When values can change dynamically | When values remain static |
+| Example URL | `/user/101` | `/user/101` |
+
+#### ✅ **Example: Using `paramMap` (Recommended)**
+```typescript
+import { ActivatedRoute } from '@angular/router';
+
+constructor(private route: ActivatedRoute) {}
+
+ngOnInit() {
+  this.route.paramMap.subscribe(params => {
+    let id = params.get('id');
+    console.log('User ID:', id);
+  });
+}
+```
+**Why?**  
+- Works for dynamic changes.
+- Angular updates the value without reloading.
+
+---
+
+#### ✅ **Example: Using `param` (Snapshot)**
+```typescript
+ngOnInit() {
+  let id = this.route.snapshot.params['id'];
+  console.log('User ID:', id);
+}
+```
+**Why?**  
+- Simple, but does not react to changes dynamically.
+
+---
+
+### **2️⃣ `queryParamMap` vs `queryParam`**
+Used to retrieve **query parameters** (`?key=value`) from the URL.
+
+| Feature  | `queryParamMap` | `queryParam` |
+|----------|----------------|--------------|
+| Type     | Observable (`queryParamMap.subscribe()`) | Snapshot (`this.route.snapshot.queryParams`) |
+| When to use | When values can change dynamically | When values remain static |
+| Example URL | `/products?category=laptop&page=2` | `/products?category=laptop&page=2` |
+
+#### ✅ **Example: Using `queryParamMap` (Recommended)**
+```typescript
+import { ActivatedRoute } from '@angular/router';
+
+constructor(private route: ActivatedRoute) {}
+
+ngOnInit() {
+  this.route.queryParamMap.subscribe(params => {
+    let category = params.get('category');
+    let page = params.get('page');
+    console.log('Category:', category, 'Page:', page);
+  });
+}
+```
+**Why?**  
+- Automatically updates if the query parameters change.
+
+---
+
+#### ✅ **Example: Using `queryParam` (Snapshot)**
+```typescript
+ngOnInit() {
+  let category = this.route.snapshot.queryParams['category'];
+  let page = this.route.snapshot.queryParams['page'];
+  console.log('Category:', category, 'Page:', page);
+}
+```
+**Why?**  
+- Simple, but does not react to dynamic changes.
+
+---
